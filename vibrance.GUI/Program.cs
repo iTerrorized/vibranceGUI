@@ -17,7 +17,6 @@ namespace vibrance.GUI
     static class Program
     {
         private const string ErrorGraphicsAdapterUnknown = "Failed to determine your Graphic GraphicsAdapter type (NVIDIA/AMD). Make sure you have installed a proper GPU driver. Intel laptops are not supported as stated on the website. When installing your GPU driver did not work, please contact @juvlarN at twitter. Press Yes to open twitter in your browser now. Error: ";
-        private const string ErrorGraphicsAdapterAmbiguous = "Both NVIDIA and AMD graphic drivers have been found on your system. This can happen when you recently switched your graphic card and did not uninstall the old drivers. Make sure to uninstall unused graphic drivers to keep your system safe and stable. Use the program \"Display Driver Uninstaller\" to uninstall your old drivers!\n\nPress Yes to open \"Display Driver Uninstaller\" download website now.\nPress No to quit vibranceGUI.";
         private const string MessageBoxCaption = "vibranceGUI Error";
 
         [STAThread]
@@ -36,6 +35,8 @@ namespace vibrance.GUI
             NativeMethods.SetDllDirectory(CommonUtils.GetVibrance_GUI_AppDataPath());
 
             GraphicsAdapter adapter = GraphicsAdapterHelper.GetAdapter();
+            if (adapter == GraphicsAdapter.Ambiguous)
+                adapter = GraphicsAdapter.Nvidia;
             Form vibranceGui = null;
 
             if (adapter == GraphicsAdapter.Amd)
@@ -75,15 +76,6 @@ namespace vibrance.GUI
                     MessageBoxCaption, MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes)
                 {
                     System.Diagnostics.Process.Start("https://twitter.com/juvlarN");
-                }
-                return;
-            }
-            else if(adapter == GraphicsAdapter.Ambiguous)
-            {
-                if(MessageBox.Show(ErrorGraphicsAdapterAmbiguous, MessageBoxCaption, MessageBoxButtons.YesNo, 
-                    MessageBoxIcon.Error) == DialogResult.Yes)
-                {
-                    System.Diagnostics.Process.Start("http://www.guru3d.com/files-details/display-driver-uninstaller-download.html");
                 }
                 return;
             }
